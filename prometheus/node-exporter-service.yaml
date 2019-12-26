@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+    
+  labels:
+    component: "node-exporter"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-node-exporter
+spec:
+  clusterIP: None
+  ports:
+    - name: metrics
+      port: 9100
+      protocol: TCP
+      targetPort: 9100
+  selector:
+    component: "node-exporter"
+    app: prometheus
+    release: rel
+  type: "ClusterIP"
+---

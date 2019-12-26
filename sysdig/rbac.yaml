@@ -1,0 +1,84 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: release-sysdig
+  labels:
+    app: release-sysdig
+    release: "release"
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - replicationcontrollers
+      - services
+      - events
+      - limitranges
+      - namespaces
+      - nodes
+      - resourcequotas
+      - persistentvolumes
+      - persistentvolumeclaims
+      - configmaps
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+      - deployments
+      - replicasets
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - batch
+    resources:
+      - cronjobs
+      - jobs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - daemonsets
+      - deployments
+      - ingresses
+      - replicasets
+    verbs:
+      - get
+      - list
+      - watch
+---
+# Source: sysdig/templates/clusterrolebinding.yaml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: release-sysdig
+  labels:
+    app: release-sysdig
+    release: "release"
+subjects:
+  - kind: ServiceAccount
+    name: release-sysdig
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: release-sysdig
+  apiGroup: rbac.authorization.k8s.io
+---

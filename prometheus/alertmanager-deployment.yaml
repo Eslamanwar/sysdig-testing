@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: "alertmanager"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-alertmanager
+spec:
+  selector:
+    matchLabels:
+      component: "alertmanager"
+      app: prometheus
+      release: rel
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: "alertmanager"
+        app: prometheus
+        release: rel
+        chart: prometheus-9.7.2
+        heritage: Tiller
+    spec:
+      serviceAccountName: rel-prometheus-alertmanager
+      containers:
+        - name: prometheus-alertmanager
+          image: "prom/alertmanager:v0.18.0"
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+          args:
+            - --config.file=/etc/config/alertmanager.yml
+            - --storage.path=/data
+            - --cluster.advertise-address=$(POD_IP):6783
+            - --web.external-url=/
+
+          ports:
+            - containerPort: 9093
+          readinessProbe:
+            httpGet:
+              path: /#/status
+              port: 9093
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+          resources:
+            {}
+            
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+            - name: storage-volume
+              mountPath: "/data"
+              subPath: ""
+
+        - name: prometheus-alertmanager-configmap-reload
+          image: "jimmidyson/configmap-reload:v0.2.2"
+          imagePullPolicy: "IfNotPresent"
+          args:
+            - --volume-dir=/etc/config
+            - --webhook-url=http://127.0.0.1:9093/-/reload
+          resources:
+            {}
+            
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+              readOnly: true
+      securityContext:
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        
+      volumes:
+        - name: config-volume
+          configMap:
+            name: rel-prometheus-alertmanager
+        - name: storage-volume
+          persistentVolumeClaim:
+            claimName: rel-prometheus-alertmanager
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    component: "alertmanager"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-alertmanager
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 9093
+  selector:
+    component: "alertmanager"
+    app: prometheus
+    release: rel
+  sessionAffinity: None
+  type: "ClusterIP"

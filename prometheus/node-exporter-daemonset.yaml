@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    component: "node-exporter"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-node-exporter
+spec:
+  selector:
+    matchLabels:
+      component: "node-exporter"
+      app: prometheus
+      release: rel
+  updateStrategy:
+    type: RollingUpdate
+    
+  template:
+    metadata:
+      labels:
+        component: "node-exporter"
+        app: prometheus
+        release: rel
+        chart: prometheus-9.7.2
+        heritage: Tiller
+    spec:
+      serviceAccountName: rel-prometheus-node-exporter
+      containers:
+        - name: prometheus-node-exporter
+          image: "prom/node-exporter:v0.18.0"
+          imagePullPolicy: "IfNotPresent"
+          args:
+            - --path.procfs=/host/proc
+            - --path.sysfs=/host/sys
+          ports:
+            - name: metrics
+              containerPort: 9100
+              hostPort: 9100
+          resources:
+            {}
+            
+          volumeMounts:
+            - name: proc
+              mountPath: /host/proc
+              readOnly:  true
+            - name: sys
+              mountPath: /host/sys
+              readOnly: true
+      hostNetwork: true
+      hostPID: true
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+---
+

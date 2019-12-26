@@ -1,0 +1,264 @@
+---
+# Source: prometheus/templates/alertmanager-serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    component: "alertmanager"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-alertmanager
+---
+# Source: prometheus/templates/kube-state-metrics-serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    component: "kube-state-metrics"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-kube-state-metrics
+---
+# Source: prometheus/templates/node-exporter-serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    component: "node-exporter"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-node-exporter
+---
+# Source: prometheus/templates/pushgateway-serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    component: "pushgateway"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-pushgateway
+---
+# Source: prometheus/templates/server-serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    component: "server"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-server
+---
+# Source: prometheus/templates/alertmanager-clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels:
+    component: "alertmanager"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-alertmanager
+rules:
+  []
+---
+# Source: prometheus/templates/kube-state-metrics-clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels:
+    component: "kube-state-metrics"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-kube-state-metrics
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - nodes
+      - persistentvolumeclaims
+      - pods
+      - services
+      - resourcequotas
+      - replicationcontrollers
+      - limitranges
+      - persistentvolumeclaims
+      - persistentvolumes
+      - endpoints
+      - secrets
+      - configmaps
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - daemonsets
+      - deployments
+      - ingresses
+      - replicasets
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+      - deployments
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - batch
+    resources:
+      - cronjobs
+      - jobs
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - policy
+    resources:
+      - poddisruptionbudgets
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - certificates.k8s.io
+    resources:
+      - certificatesigningrequests
+    verbs:
+      - list
+      - watch
+---
+# Source: prometheus/templates/pushgateway-clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels:
+    component: "pushgateway"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-pushgateway
+rules:
+  []
+---
+# Source: prometheus/templates/server-clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels:
+    component: "server"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-server
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+      - nodes/proxy
+      - nodes/metrics
+      - services
+      - endpoints
+      - pods
+      - ingresses
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - ingresses/status
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - nonResourceURLs:
+      - "/metrics"
+    verbs:
+      - get
+---
+# Source: prometheus/templates/alertmanager-clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    component: "alertmanager"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-alertmanager
+subjects:
+  - kind: ServiceAccount
+    name: rel-prometheus-alertmanager
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rel-prometheus-alertmanager
+---
+# Source: prometheus/templates/kube-state-metrics-clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    component: "kube-state-metrics"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-kube-state-metrics
+subjects:
+  - kind: ServiceAccount
+    name: rel-prometheus-kube-state-metrics
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rel-prometheus-kube-state-metrics
+---
+# Source: prometheus/templates/pushgateway-clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    component: "pushgateway"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-pushgateway
+subjects:
+  - kind: ServiceAccount
+    name: rel-prometheus-pushgateway
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rel-prometheus-pushgateway
+---
+# Source: prometheus/templates/server-clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    component: "server"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-server
+subjects:
+  - kind: ServiceAccount
+    name: rel-prometheus-server
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rel-prometheus-server

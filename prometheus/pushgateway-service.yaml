@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/probe: pushgateway
+    
+  labels:
+    component: "pushgateway"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-pushgateway
+spec:
+  ports:
+    - name: http
+      port: 9091
+      protocol: TCP
+      targetPort: 9091
+  selector:
+    component: "pushgateway"
+    app: prometheus
+    release: rel
+  type: "ClusterIP"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: "pushgateway"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-pushgateway
+spec:
+  selector:
+    matchLabels:
+      component: "pushgateway"
+      app: prometheus
+      release: rel
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: "pushgateway"
+        app: prometheus
+        release: rel
+        chart: prometheus-9.7.2
+        heritage: Tiller
+    spec:
+      serviceAccountName: rel-prometheus-pushgateway
+      containers:
+        - name: prometheus-pushgateway
+          image: "prom/pushgateway:v0.8.0"
+          imagePullPolicy: "IfNotPresent"
+          args:
+          ports:
+            - containerPort: 9091
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9091
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9091
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+          resources:
+            {}
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+

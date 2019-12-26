@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+    
+  labels:
+    component: "kube-state-metrics"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-kube-state-metrics
+spec:
+  clusterIP: None
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    component: "kube-state-metrics"
+    app: prometheus
+    release: rel
+  type: "ClusterIP"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: "kube-state-metrics"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-kube-state-metrics
+spec:
+  selector:
+    matchLabels:
+      component: "kube-state-metrics"
+      app: prometheus
+      release: rel
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: "kube-state-metrics"
+        app: prometheus
+        release: rel
+        chart: prometheus-9.7.2
+        heritage: Tiller
+    spec:
+      serviceAccountName: rel-prometheus-kube-state-metrics
+      containers:
+        - name: prometheus-kube-state-metrics
+          image: "quay.io/coreos/kube-state-metrics:v1.6.0"
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - name: metrics
+              containerPort: 8080
+          resources:
+            {}
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534

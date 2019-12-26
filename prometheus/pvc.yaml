@@ -1,0 +1,35 @@
+---
+# Source: prometheus/templates/alertmanager-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    component: "alertmanager"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-alertmanager
+spec:
+  accessModes:
+    - ReadWriteOnce
+    
+  resources:
+    requests:
+      storage: "2Gi"
+---
+# Source: prometheus/templates/server-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    component: "server"
+    app: prometheus
+    release: rel
+  name: rel-prometheus-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+    
+  resources:
+    requests:
+      storage: "8Gi"
+---

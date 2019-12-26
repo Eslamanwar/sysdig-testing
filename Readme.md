@@ -41,8 +41,10 @@ kubectl get nodes -o wide
 
 ## Deploy Sysdig
 - Modify the ./sysdig/Secret.yaml file and insert your Sysdig cloud Access key encoded 64 format
-- kubectl create -f ./sysdig/
 
+```
+- kubectl create -f ./sysdig/
+```
 
 ## Deploy sample java application to collect promethus metrics
 ```
@@ -53,12 +55,12 @@ kubectl get nodes -o wide
 
 ## Results
 - with sysdig you can monitor the Network traffic between pods
-![alt text](http://url/to/img.png)
+![alt text](https://github.com/Eslamanwar/sysdig-testing/blob/master/images/network-traffic.png?raw=true)
 
 
 
 - It can be intergrated to collect promethues metrics for the sample application we just created
-![alt text](http://url/to/img.png)
+![alt text](https://github.com/Eslamanwar/sysdig-testing/blob/master/images/Promethus-metrics.png?raw=true)
 
 
 
@@ -73,7 +75,7 @@ kubectl create -f prometheus/
 ```
 
 
-![alt text](http://url/to/img.png)
+![alt text](https://github.com/Eslamanwar/sysdig-testing/blob/master/images/promethus.png?raw=true)
 
 
 

@@ -73,7 +73,11 @@ kubectl get nodes -o wide
 ```
 kubectl create -f prometheus/
 ```
+- to run the promethus server
 
+```
+kubectl port-forward svc/{promethus_server} 1111:80
+```
 
 ![alt text](https://github.com/Eslamanwar/sysdig-testing/blob/master/images/promethus.png?raw=true)
 
@@ -81,9 +85,11 @@ kubectl create -f prometheus/
 
 
 
+## Deploy the sysdig open source CLI
+- install Docker run-time
+- docker run -i -t --name sysdig --privileged -v /var/run/docker.sock:/host/var/run/docker.sock -v /dev:/host/dev -v /proc:/host/proc:ro -v /boot:/host/boot:ro -v /lib/modules:/host/lib/modules:ro -v /usr:/host/usr:ro sysdig/sysdig
 
-
-
+![alt text](https://github.com/Eslamanwar/sysdig-testing/blob/master/images/csysdig.jpg?raw=true)
 
 
 

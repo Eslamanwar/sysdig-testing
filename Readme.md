@@ -22,6 +22,8 @@ NOTE: This tutorial will create a cluster in us-west-1 using the 10.0.0.0/16 sub
 - terraform plan
 - terraform apply
 ```
+- if you wan to modify the Region --> modify that file eks/providers.tf
+- if you want to modify the number of worker nodes --> modify that file eks/eks-worker-nodes.tf
 
 ### Setting Up kubectl to connect to cluster
 ```
